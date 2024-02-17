@@ -22,30 +22,44 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/titleTextView"
-        android:layout_marginTop="16dp"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center"
         android:adjustViewBounds="true"
-        android:scaleType="centerCrop"
-        android:layout_centerHorizontal="true"/>
+        android:scaleType="fitCenter"
+        android:layout_marginBottom="16dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"/>
 
     <!-- Code EditText -->
     <EditText
         android:id="@+id/codeEditText"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/duckImageView"
-        android:layout_marginTop="16dp"
+        android:layout_above="@id/nextButton"
         android:hint="Enter code"
         android:inputType="number"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:maxLength="3"
+        android:maxLines="1"
 
-    <!-- Next Button -->
+        android:layout_marginBottom="25dp"
+        android:layout_marginStart="150dp"
+        android:layout_marginEnd="150dp"/>
+
+    <!-- SEND Button -->
     <Button
         android:id="@+id/nextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Next"
-        android:layout_below="@id/codeEditText"
-        android:layout_marginTop="16dp"
-        android:layout_centerHorizontal="true"/>
+        android:text="SEND"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"/>
+
+
 
 </RelativeLayout>

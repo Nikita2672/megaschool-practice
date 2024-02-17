@@ -2,9 +2,11 @@ package ru.sample.duckapp
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.squareup.picasso.Picasso
@@ -16,10 +18,9 @@ import ru.sample.duckapp.infra.Api
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var nextButton: Button
+    private lateinit var sendButton: Button
     private lateinit var duckImageView: ImageView
-    private lateinit var codeEditText: EditText // Add an EditText to input the code
-
+    private lateinit var codeEditText: EditText
     private val ducksApi = Api.ducksApi
 
     @SuppressLint("MissingInflatedId")
@@ -28,15 +29,22 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         duckImageView = findViewById(R.id.duckImageView)
-        nextButton = findViewById(R.id.nextButton)
-        codeEditText = findViewById(R.id.codeEditText) // Initialize the EditText
+        sendButton = findViewById(R.id.nextButton)
+        codeEditText = findViewById(R.id.codeEditText)
 
-        nextButton.setOnClickListener {
-            val code = codeEditText.text.toString().toIntOrNull()
-            if (code != null) {
-                loadImage(BASE_URL + "http/" + code)
+        sendButton.setOnClickListener {
+
+            val codeText = codeEditText.text.toString()
+            val code = codeText.toIntOrNull()
+
+            if (codeText.isBlank()) {
+                fetchRandomDuckImage()
+            } else if (code == null) {
+                showToast(INVALID_CODE)
+            } else if (isCodeInWhiteList(code)) {
+                fetchDuckByCodeImage(code)
             } else {
-                showToast("Invalid code. Please enter a valid integer.")
+                showToast(CODE_NOT_FOUND)
             }
         }
     }
@@ -44,6 +52,14 @@ class MainActivity : AppCompatActivity() {
     private fun fetchRandomDuckImage() {
         try {
             getRandomDuckAsync()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun fetchDuckByCodeImage(code: Int) {
+        try {
+            getDuckByCodeAsync(code)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -58,14 +74,19 @@ class MainActivity : AppCompatActivity() {
                         loadImage(it.url)
                     }
                 } else {
-                    showToast("Failed to fetch duck image")
+                    showToast(FAILED_FETCH)
                 }
             }
 
             override fun onFailure(call: Call<Duck>, t: Throwable) {
-                showToast("Failed to fetch duck image")
+                showToast(FAILED_FETCH)
             }
         })
+    }
+
+    private fun getDuckByCodeAsync(code: Int) {
+        val imageUrl = BASE_URL + CODE_ENDPOINT + code
+        loadImage(imageUrl)
     }
 
     private fun loadImage(imageUrl: String) {
@@ -78,5 +99,21 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val BASE_URL = "https://random-d.uk/api/v2/"
+
+        private const val CODE_ENDPOINT = "http/"
+
+        private const val INVALID_CODE = "Invalid code. Please enter a valid integer."
+
+        private const val CODE_NOT_FOUND = "Code not found. There is no duck with such code."
+
+        private const val FAILED_FETCH = "Failed to fetch duck image."
+
+        private val codeWhiteList = listOf(
+            100, 200, 301, 302, 400, 403, 404, 409, 413, 418, 420, 426, 429, 451, 500
+        )
+
+        fun getCodeWhiteList(): List<Int> = codeWhiteList
+
+        fun isCodeInWhiteList(code: Int): Boolean = code in codeWhiteList
     }
 }
